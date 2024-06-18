@@ -85,14 +85,6 @@ RETRY_TIME = 2
 DOWNLOAD_DELAY = 10
 CONCURRENT_REQUESTS_PER_DOMAIN = 1
 
-# MARIADB_HOST = '172.30.201.175'
-# MARIADB_PORT = 3306
-# MARIADB_USERNM = 'root'
-# MARIADB_PASSWD = 'P@ssw0rd9!'
-# MARIADB_DBNM = 'rissue'
-
-
-
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -120,37 +112,6 @@ FEED_EXPORT_ENCODING='utf-8'
 LOG_LEVEL = "ERROR"
 LOG_FORMAT = '%(levelname)s: %(message)s'
 # LOG_STDOUT = True
-
-# 상용
-ELASTICSEARCH_SERVER = 'http://172.30.201.175'
-ELASTICSEARCH_PORT = 9200
-MARIADB_HOST = '172.30.201.175'
-MARIADB_PORT = 3306
-MARIADB_USERNM = 'root'
-MARIADB_PASSWD = 'P@ssw0rd0!'
-MARIADB_DBNM = 'rissue'
-LOG_PATH = '/applog/crawler/youtube/'
-
-# 테스트
-# ELASTICSEARCH_SERVER = 'http://10.7.18.2'
-# ELASTICSEARCH_PORT = 9200
-# MARIADB_HOST = '10.7.18.2'
-# MARIADB_PORT = 3306
-# MARIADB_USERNM = 'root'
-# MARIADB_PASSWD = 'wizontech0418'
-# MARIADB_DBNM = 'rissue'
-# LOG_PATH = '/applog/crawler/youtube/'
-
-
-# 로컬
-# ELASTICSEARCH_SERVER = 'http://10.7.18.2'
-# ELASTICSEARCH_PORT = 9200
-# MARIADB_HOST = '10.7.18.2'
-# MARIADB_PORT = 3306
-# MARIADB_USERNM = 'root'
-# MARIADB_PASSWD = 'wizontech0418'
-# MARIADB_DBNM = 'rissue'
-#LOG_PATH = '/Users/wizontech/applog/crawler/youtube/'
 
 
 
