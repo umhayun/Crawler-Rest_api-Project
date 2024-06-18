@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="query">
+
+  <!-- collector -->
+  <select id="selectFailureList_current" resultType="hashMap">
+    SELECT * FROM CURRENT_API
+  </select>
+
+  <insert id="insertFailure" useGeneratedKeys="true" keyProperty="NO" parameterType="hashMap">
+    INSERT INTO CURRENT_API (
+      SIGNAL_TYPE, 
+      EQUIPMENT_TYPE, 
+      FAULT_TYPE, 
+      FAULT_CODE, 
+      DDNS_CAMERAUSAGE, 
+      FAULT_DESC, 
+      ISSUE_DATE, 
+      ISSUE_TIME, 
+      SN, 
+      UID, 
+      CAMERA_TYPE, 
+      LOG_DATE,
+      CONTRACT_NO,
+      ACCOUNT_NO,
+      SERVICE_STR,
+      MODEL_NM,
+      RESERVED,
+      FIRM
+    ) VALUES (
+      #{SIGNAL_TYPE}, 
+      #{EQUIPMENT_TYPE}, 
+      #{FAULT_TYPE}, 
+      #{FAULT_CODE}, 
+      #{DDNS_CAMERAUSAGE}, 
+      #{FAULT_DESC}, 
+      #{ISSUE_DATE}, 
+      #{ISSUE_TIME}, 
+      #{SN}, 
+      #{UID}, 
+      #{CAMERA_TYPE}, 
+      #{LOG_DATE},
+      #{CONTRACT_NO},
+      #{ACCOUNT_NO},
+      #{SERVICE_STR},
+      #{MODEL_NM},
+      #{RESERVED},
+      #{FIRM}
+    )
+  </insert>
+
+    <insert id="insertArgosSend" parameterType="hashMap">
+    INSERT INTO ARGOS_SEND (
+      NO,
+      SIGNAL_TYPE, 
+      EQUIPMENT_TYPE, 
+      FAULT_TYPE, 
+      FAULT_CODE, 
+      ISSUE_DATE, 
+      ISSUE_TIME, 
+      SN, 
+      CONTRACT_NO,
+      ACCOUNT_NO,
+      MODEL_NM,
+      RESERVED,
+      FIRM
+    ) VALUES (
+      #{NO},
+      #{SIGNAL_TYPE}, 
+      #{EQUIPMENT_TYPE}, 
+      #{FAULT_TYPE}, 
+      #{FAULT_CODE}, 
+      #{ISSUE_DATE}, 
+      #{ISSUE_TIME}, 
+      #{SN}, 
+      #{CONTRACT_NO},
+      #{ACCOUNT_NO},
+      #{MODEL_NM},
+      #{RESERVED},
+      #{FIRM}
+    )
+  </insert>
+
+  <update id="updateRecovery" parameterType="hashMap">
+    UPDATE HEALTHCARE_TRAN 
+    SET modifyDate = #{FULL_DATE},
+        signalType = #{SIGNAL_TYPE},
+        update_date = #{ISSUE_DATE},
+        update_time = #{ISSUE_TIME}
+    WHERE no = #{no}
+  </update>
+
+  <select id="selectFailure" parameterType="hashMap" resultType="hashMap">
+    SELECT * FROM CURRENT_API
+    WHERE UID = #{UID} 
+    AND SN = #{SN} 
+    AND FAULT_TYPE = #{FAULT_TYPE} 
+    AND FAULT_CODE = #{FAULT_CODE}
+    AND SIGNAL_TYPE = 'E'
+  </select>
+
+  <delete id="deleteFailure" parameterType="hashMap">
+    DELETE FROM CURRENT_API 
+    WHERE UID = #{UID} 
+    AND SN = #{SN} 
+    AND FAULT_TYPE = #{FAULT_TYPE} 
+    AND FAULT_CODE = #{FAULT_CODE}
+  </delete>
+
+  <select id="selectCLAvgList" resultType="hashMap">
+    SELECT 
+      NVRSN,
+      CATEGORY,
+      CHECK_L,
+      DATE_TIME 
+    FROM PATTERN_API 
+    WHERE TYPE = 'L'
+  </select>
+
+  <select id="selectConditionList" resultType="hashMap">
+    SELECT 
+      TROUBLESEQ,
+      SCOPE,
+      NVRSN,
+      NETOFF_TIME,
+      LOSS_YN,
+      HDD_TYPE
+    FROM CONDITION_API 
+    ORDER BY DATE_TIME DESC
+  </select>
+
+
+  <!-- reporter -->
+
+  <!-- Condition -->
+  <select id="getConditionList" resultType="com.wizontech.adtcaps.entity.ConditionData">
+    SELECT * FROM CONDITION_API
+    ORDER BY TROUBLESEQ+0 ASC
+  </select>
+
+  <insert id="insertCondition" parameterType="com.wizontech.adtcaps.entity.ConditionData">
+    INSERT INTO CONDITION_API(
+      TROUBLESEQ,
+      SCOPE,
+      INDUSTRYCODE,
+      NVRSN,
+      NETOFF_TIME,
+      UPDATETIME_RECEND_TIME,
+      RECSTARTTIME_RECEND_TIME,
+      LOSS_YN,
+      HDD_TYPE
+    )
+    VALUES (
+      #{TroubleSEQ},
+      #{Scope},
+      #{IndustryCode},
+      #{NVRSN},
+      #{NetOff_Time},
+      #{UpdateTime_RecEnd_Time},
+      #{RecstartTime_RecEnd_Time},
+      #{Loss_YN},
+      #{HDD_Type}
+    )
+  </insert>
+
+  <update id="updateCondition" parameterType="com.wizontech.adtcaps.entity.ConditionData">
+    UPDATE CONDITION_API
+    SET TROUBLESEQ = #{TroubleSEQ}, 
+      SCOPE = #{Scope},
+      INDUSTRYCODE = #{IndustryCode},
+      NVRSN = #{NVRSN},
+      NETOFF_TIME = #{NetOff_Time},
+      UPDATETIME_RECEND_TIME = #{UpdateTime_RecEnd_Time},
+      RECSTARTTIME_RECEND_TIME = #{RecstartTime_RecEnd_Time},
+      LOSS_YN = #{Loss_YN},
+      HDD_TYPE = #{HDD_Type}
+    WHERE TROUBLESEQ = #{TroubleSEQ}
+  </update>
+
+  <delete id="deleteCondition" parameterType="String">
+    DELETE FROM CONDITION_API WHERE TROUBLESEQ = #{TroubleSEQ}
+  </delete>
+
+  <!-- Equipment -->
+  <select id="getEquipmentList" resultType="com.wizontech.adtcaps.entity.EquipmentData">
+    SELECT * FROM EQUIPMENT_API
+    ORDER BY NVRSN+0 ASC
+  </select>
+
+  <insert id="insertEquipment" parameterType="com.wizontech.adtcaps.entity.EquipmentData">
+    INSERT INTO EQUIPMENT_API(
+      NVRSN,
+      MODEL,
+      DDNS_SEQ,
+      DDNS_UID,
+      DDNS_HOST_NAME,
+      DDNS_SERIAL,
+      DDNS_ACC_NO,
+      DDNS_OUT_IP,
+      DDNS_IN_IP,
+      DDNS_WEB_PORT,
+      DDNS_NET_PORT,
+      DDNS_HDD,
+      DDNS_CH,
+      DDNS_FIRM,
+      DDNS_DVR_DATE,
+      DDNS_DVR_TIME,
+      DDNS_SERVER_DATE,
+      DDNS_SERVER_TIME,
+      HDD,
+      FIRM,
+      CAMER_USAGE,
+      REC_START_TIME_CHAR,
+      REC_END_TIME_CHAR,
+      UPDATE_TIME_CHAR,
+      SAFEBACKUPCAMERAS,
+      RTSP_CONNECTION,
+      MQ_CONNCETION,
+      STATUS
+    )
+    VALUES (
+      #{NVRSN},
+      #{model},
+      #{ddns_seq},
+      #{ddns_uid},
+      #{ddns_host_name},
+      #{ddns_serial},
+      #{ddns_acc_no},
+      #{ddns_out_ip},
+      #{ddns_in_ip},
+      #{ddns_web_port},
+      #{ddns_net_port},
+      #{ddns_hdd},
+      #{ddns_ch},
+      #{ddns_firm},
+      #{ddns_dvr_date},
+      #{ddns_dvr_time},
+      #{ddns_server_date},
+      #{ddns_server_time},
+      #{hdd},
+      #{firm},
+      #{camer_usage},
+      #{rec_start_time_char},
+      #{rec_end_time_char},
+      #{update_time_char},       
+      #{safeBackupCameras},
+      #{rtsp_connection},
+      #{mq_conncetion},              
+      #{Status}
+    )
+  </insert>
+
+  <update id="updateEquipment" parameterType="com.wizontech.adtcaps.entity.EquipmentData">
+    UPDATE EQUIPMENT_API
+    SET NVRSN = #{NVRSN},
+      MODEL = #{model},
+      DDNS_SEQ = #{ddns_seq},
+      DDNS_UID = #{ddns_uid},
+      DDNS_HOST_NAME = #{ddns_host_name},
+      DDNS_SERIAL = #{ddns_serial},
+      DDNS_ACC_NO = #{ddns_acc_no},
+      DDNS_OUT_IP = #{ddns_out_ip},
+      DDNS_IN_IP = #{ddns_in_ip},
+      DDNS_WEB_PORT = #{ddns_web_port},
+      DDNS_NET_PORT = #{ddns_net_port},
+      DDNS_HDD = #{ddns_hdd},
+      DDNS_CH = #{ddns_ch},
+      DDNS_FIRM = #{ddns_firm},
+      DDNS_DVR_DATE = #{ddns_dvr_date},
+      DDNS_DVR_TIME = #{ddns_dvr_time},
+      DDNS_SERVER_DATE = #{ddns_server_date},
+      DDNS_SERVER_TIME = #{ddns_server_time},
+      HDD = #{hdd},
+      FIRM = #{firm},
+      CAMER_USAGE = #{camer_usage},
+      REC_START_TIME_CHAR = #{rec_start_time_char},
+      REC_END_TIME_CHAR = #{rec_end_time_char},
+      UPDATE_TIME_CHAR = #{update_time_char},
+      SAFEBACKUPCAMERAS = #{safeBackupCameras},
+      RTSP_CONNECTION = #{rtsp_connection},
+      MQ_CONNCETION = #{mq_conncetion},
+      STATUS = #{Status}
+    WHERE NVRSN = #{NVRSN}
+  </update>
+
+  <delete id="deleteEquipment" parameterType="String">
+    DELETE FROM EQUIPMENT_API WHERE NVRSN = #{NVRSN}
+  </delete>
+
+
+  <!--Equipment Info-->
+  <insert id="insertEquipmentInfo" parameterType="com.wizontech.adtcaps.entity.EquipmentInfoData">
+    INSERT INTO EQUIPMENT_INFO (
+      NUM,
+      SN,
+      MAC,
+      CONTRACTNO,
+      ACCOUNTNO
+    )
+    VALUES (
+      #{num},
+      #{sn},
+      #{mac},
+      #{contract_no},
+      #{account_no}
+    )
+  </insert>
+
+  <update id="updateEquipmentInfo" parameterType="com.wizontech.adtcaps.entity.EquipmentInfoData">
+    UPDATE EQUIPMENT_INFO
+    SET NUM=#{num},
+        SN=#{sn},
+        MAC=#{mac},
+        CONTRACTNO=#{contract_no},
+        ACCOUNTNO=#{account_no}
+    WHERE SN=#{sn}
+  </update>
+
+  <delete id="deleteEquipmentInfo" parameterType="int">
+    DELETE FROM EQUIPMENT_INFO
+    WHERE NUM=#{num}
+  </delete>
+  
+
+
+  <select id="getEquipmentInfoList" parameterType="string" resultType="com.wizontech.adtcaps.entity.EquipmentInfoData">
+    SELECT NUM, SN, MAC, CONTRACTNO as contract_no, ACCOUNTNO as account_no
+    FROM EQUIPMENT_INFO
+    WHERE SN=#{sn}
+  </select>
+
+  <select id="getEquipmentInfoNumList" parameterType="int" resultType="com.wizontech.adtcaps.entity.EquipmentInfoData">
+    SELECT NUM, SN, MAC, CONTRACTNO as contract_no, ACCOUNTNO as account_no
+    FROM EQUIPMENT_INFO
+    WHERE NUM=#{num}
+  </select>
+
+
+  <!--Contract Info-->
+
+
+  <select id="getContractInfoList" resultType="hashmap">
+    SELECT contractNo,serviceStr ,monStatus 
+    FROM CONTRACT_INFO
+    WHERE contractNo=#{contract_no}
+  </select>
+
+  <insert id="InsertContractInfo" parameterType="com.wizontech.adtcaps.entity.ContractInfoData">
+    INSERT INTO CONTRACT_INFO (CONTRACTNO,SERVICESTR,MONSTATUS)
+    VALUES (#{contract_no},#{service_str},#{mon_status})
+    ON DUPLICATE KEY UPDATE 
+    CONTRACTNO=#{contract_no}, SERVICESTR=#{service_str},MONSTATUS=#{mon_status}
+  </insert>
+
+  <delete id="deleteContractInfo">
+    DELETE FROM CONTRACT_INFO
+    WHERE  NOT (serviceStr like "%A01%" 
+                or serviceStr like "%A02%") 
+            or  monStatus not IN ('0','1')
+  </delete>
+
+  <!--ArgosSendStatus-->
+  <update id="updateArgosStatus" parameterType="hashmap">
+    UPDATE ARGOS_STATUS
+    SET SEND_YN=#{send_yn}
+  </update>
+
+  <select id="getArgosStatus" resultType="hashmap">
+    SELECT *
+    FROM ARGOS_STATUS
+  </select>
+
+  <!--Failure Health-->
+    <select id="countHealth" resultType="hashmap">
+      SELECT no
+      FROM  HEALTHCARE_TRAN
+      WHERE 1=1 
+      <if test="!HARTL_Issuse_Date_Start.equals('') and !HARTL_Issuse_Date_End.equals('')">
+          AND  ISSUE_DATE BETWEEN #{HARTL_Issuse_Date_Start} AND #{HARTL_Issuse_Date_End}
+      </if>
+      <if test="!HARTL_Fault_Type.equals('')">
+            AND FAULTTYPE=#{HARTL_Fault_Type}
+      </if>
+      <if test="!sn.equals('')">
+          AND SN=#{sn}
+      </if>
+      <if test="!contractNo.equals('')">
+          AND CONTRACTNO=#{contractNo}
+      </if>
+      <if test="!accountNo.equals('')">
+          AND ACCOUNTNO=#{accountNo}
+      </if>
+
+      <if test='HARTL_Nomodify.equals("Y")'>
+            AND update_date is null
+      </if> 
+
+    </select>
+
+    <select id="getHealthInfo" resultType="java.util.LinkedHashMap">
+      SELECT A.*
+      FROM (SELECT CAST(@rownum:=@rownum+1 AS char(100)) as ROWNUM, sn, modelNm,IFNULL(firm,'') AS firm, contractNo,accountNo,signalType, equipmentType, faultType, faultCode, issue_date,issue_time,
+            IFNULL(update_date,'') AS update_date,IFNULL(update_time,'') AS update_time
+            FROM HEALTHCARE_TRAN,(SELECT @ROWNUM:=0) RN 
+            WHERE 1=1 
+        <if test="!HARTL_Issuse_Date_Start.equals('') and !HARTL_Issuse_Date_End.equals('')">
+          AND  ISSUE_DATE BETWEEN #{HARTL_Issuse_Date_Start} AND #{HARTL_Issuse_Date_End}
+        </if>
+        <if test="!HARTL_Fault_Type.equals('')">
+              AND FAULTTYPE=#{HARTL_Fault_Type}
+        </if>
+        <if test="!sn.equals('')">
+            AND SN=#{sn}
+        </if>
+        <if test="!contractNo.equals('')">                                                         
+            AND CONTRACTNO=#{contractNo}
+        </if>
+        <if test="!accountNo.equals('')">
+            AND ACCOUNTNO=#{accountNo}
+        </if>
+        <if test='HARTL_Nomodify.equals("Y")'>
+              AND update_date is null
+        </if> 
+        ORDER BY ISSUE_DATE DESC, ISSUE_TIME DESC
+      ) A
+      LIMIT #{List_Start_Num},#{List_End_Num}
+    </select>
+
+
+
+
+
+  <!-- Industry -->
+  <select id="getIndustryList" resultType="com.wizontech.adtcaps.entity.IndustryData">
+    SELECT *
+    FROM INDUSTRY_API
+    ORDER BY DATE_TIME+0 ASC
+  </select>
+
+  <insert id="insertAllIndustry" parameterType="hashMap">
+    INSERT INTO INDUSTRY_API(
+      NVRSN, 
+      INDUSTRYCODE,
+      GROSS,
+      GVIP,
+      DATE_TIME
+    ) 
+    VALUES 
+    <foreach collection="insertList" item="i" separator=",">
+    (
+      #{i.NVRSN},
+      #{i.INDUSTRYCODE},
+      #{i.GROSS},
+      #{i.GVIP},
+      #{i.DATE_TIME}
+    )
+    </foreach>
+  </insert>
+
+  <insert id="updateIndustry" parameterType="hashMap">
+    UPDATE INDUSTRY_API
+    SET NVRSN = #{NVRSN}, 
+      INDUSTRYCODE = #{IndustryCode}, 
+      GROSS = #{Gross}, 
+      GVIP = #{GVIP}
+    WHERE NVRSN = #{NVRSN}
+  </insert>
+
+  <delete id="deleteIndustry" parameterType="String">
+    DELETE FROM INDUSTRY_API WHERE NVRSN = #{nvr_sn}
+  </delete>
+
+  <delete id="deleteAllIndustry">
+    DELETE FROM INDUSTRY_API
+  </delete>
+
+
+  <!-- Pattern -->
+  <select id="getPatternList" resultType="hashMap">
+    SELECT * FROM PATTERN_API
+    ORDER BY PATTERNSEQ+0 ASC
+  </select>
+
+  <select id="getPattern" parameterType="String" resultType="hashMap">
+    SELECT * FROM PATTERN_API
+    WHERE PATTERNSEQ = #{patternSeq}
+  </select>
+
+  <insert id="insertPattern" parameterType="hashMap">
+    INSERT INTO PATTERN_API(
+      PATTERNSEQ,
+      TYPE,
+      SCOPE,
+      INDUSTRYCODE,
+      NVRSN,
+      CATEGORY,
+      CHECK_H,
+      CHECK_L,
+      DATE_TIME
+    )
+    VALUES (
+      #{PATTERNSEQ},
+      #{TYPE},
+      #{SCOPE},
+      #{INDUSTRYCODE},
+      #{NVRSN},
+      #{CATEGORY},
+      #{CHECK_H},
+      #{CHECK_L},
+      #{DATE_TIME}
+    )
+  </insert>
+
+  <update id="updatePattern" parameterType="hashMap">
+    UPDATE PATTERN_API
+    SET PATTERNSEQ = #{PATTERNSEQ}, 
+      TYPE = #{TYPE},
+      SCOPE = #{SCOPE},
+      INDUSTRYCODE = #{INDUSTRYCODE},
+      NVRSN = #{NVRSN},
+      CATEGORY = #{CATEGORY},
+      CHECK_H = #{CHECK_H},
+      CHECK_L = #{CHECK_L},
+      DATE_TIME = #{DATE_TIME}
+    WHERE PATTERNSEQ = #{PATTERNSEQ}
+  </update>
+
+  <delete id="deletePattern" parameterType="String">
+    DELETE FROM PATTERN_API WHERE PATTERNSEQ = #{patternSeq}
+  </delete>
+
+
+  <!-- hashMap으로 관리할 테이블 -->
+
+  <!-- industryMaskMap -->
+  <select id="selectIndustyMaskList" resultType="hashMap">
+    SELECT * FROM INDUSTRY_MASKING
+  
+  </select>
+
+  <!-- nvrMaskMap -->
+  <select id="selectNvrMaskList" resultType="hashMap">
+    SELECT * FROM NVR_MASKING
+  </select>
+
+  <!-- nvrMap -->
+  <select id="selectNvr" resultType="hashMap">
+    SELECT * FROM INDUSTRY_API
+  </select>
+  <!--equipmentInfoMap-->
+  <select id="selectEquipmentInfoList" resultType="hashmap">
+      SELECT num , sn, mac, contractNo, accountNo
+      FROM EQUIPMENT_INFO
+  </select>
+
+  <!--ContractInfoMap-->
+  <select id="selectContractInfoList" resultType="hashMap">
+    SELECT contractNo,serviceStr,monStatus
+    FROM CONTRACT_INFO
+  </select>
+
+  <!-- MASKING 테이블에 저장 -->
+  <!-- INDUSTRY_MASKING -->
+  <insert id="insertIndustryMasking" parameterType="hashMap">
+    INSERT INTO INDUSTRY_MASKING(
+      PATTERNSEQ,
+      TYPE,
+      INDUSTRYCODE,
+      CATEGORY,
+      CHECK_H
+    )
+    VALUES (
+      #{PATTERNSEQ},
+      #{TYPE},
+      #{INDUSTRYCODE},
+      #{CATEGORY},
+      #{CHECK_H}
+    )
+  </insert>
+
+  <delete id="deleteIndustryMasking" parameterType="String">
+    DELETE FROM INDUSTRY_MASKING WHERE PATTERNSEQ = #{patternSeq}
+  </delete>
+
+  <update id="updateIndustryMasking" parameterType="hashMap">
+    UPDATE INDUSTRY_MASKING
+    SET PATTERNSEQ = #{PATTERNSEQ}, 
+      TYPE = #{TYPE},
+      INDUSTRYCODE = #{INDUSTRYCODE},
+      CATEGORY = #{CATEGORY},
+      CHECK_H = #{CHECK_H}
+    WHERE PATTERNSEQ = #{PATTERNSEQ}
+  </update>
+
+
+  <!-- NVR_MASKING -->
+  <insert id="insertNvrMasking" parameterType="hashMap">
+    INSERT INTO NVR_MASKING(
+      PATTERNSEQ,
+      TYPE,
+      NVRSN,
+      CATEGORY,
+      CHECK_H
+    )
+    VALUES (
+      #{PATTERNSEQ},
+      #{TYPE},
+      #{NVRSN},
+      #{CATEGORY},
+      #{CHECK_H}
+    )
+  </insert>
+
+  <update id="updateNvrMasking" parameterType="hashMap">
+    UPDATE NVR_MASKING
+    SET PATTERNSEQ = #{PATTERNSEQ}, 
+      TYPE = #{TYPE},
+      NVRSN = #{NVRSN},
+      CATEGORY = #{CATEGORY},
+      CHECK_H = #{CHECK_H}
+    WHERE PATTERNSEQ = #{PATTERNSEQ}
+  </update>
+
+  <delete id="deleteNvrMasking" parameterType="String">
+    DELETE FROM NVR_MASKING WHERE PATTERNSEQ = #{patternSeq}
+  </delete>
+
+</mapper>
