@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+
 # Scrapy settings for fmCrawler project
 #
 # For simplicity, this file contains only settings considered important or
@@ -6,6 +9,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+load_dotenv()
 
 BOT_NAME = "fmCrawler"
 
@@ -92,16 +96,11 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
-ELASTICSEARCH_SERVER = 'http://172.30.201.175'
-ELASTICSEARCH_PORT = 9200
-
-LOG_LEVEL = "ERROR"
-LOG_FORMAT = '%(levelname)s: %(message)s'
-#LOG_PATH = '/Users/wizontech/applog/crawler/fmkorea/'
-LOG_PATH = '/applog/crawler/fmkorea/'
-
-MARIADB_HOST = '172.30.201.175'
-MARIADB_PORT = 3306
-MARIADB_USERNM = 'root'
-MARIADB_PASSWD = 'P@ssw0rd9!'
-MARIADB_DBNM = 'rissue'
+ELASTICSEARCH_SERVER = os.environ.get('ELASTICSEARCH_SERVER')
+ELASTICSEARCH_PORT = int(os.environ.get('ELASTICSEARCH_PORT'))
+MARIADB_HOST = os.environ.get('MARIADB_HOST')
+MARIADB_PORT = int(os.environ.get('MARIADB_PORT'))
+MARIADB_USERNM = os.environ.get('MARIADB_USERNM')
+MARIADB_PASSWD = os.environ.get('MARIADB_PASSWD')
+MARIADB_DBNM = os.environ.get('MARIADB_DBNM')
+LOG_PATH = f'{os.environ.get("LOG_PATH")}/fmkorea'
